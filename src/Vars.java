@@ -9,6 +9,10 @@ class Vars {
     static final String[] CAR = {"Ssangyong", "Ford", "Mini", "Bentley", "Caerham", "Radical", "Peugeot", "Lotus", "Volvo", "Kia"};
 
     static final String EMPLOYEE_DB = "EMP";
+    static final String EMPLOYEE_DB2 = "EMP";
+    static final String EMPLOYEE_DB3 = "EMP";
+    static final String EMPLOYEE_DB4= "EMP";
+
     static final String CAR_DB = "CAR2";
     static final String CLIENT_DB = "CLI";
     static final String VARIATION_DB = "VARIATION";
