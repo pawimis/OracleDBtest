@@ -11,6 +11,7 @@ class DataBase {
         dataSource.setURL("xxx");
         conn = dataSource.getConnection();
         conn.setAutoCommit(false);
+        int t = 5;
         DatabaseMetaData metaData = conn.getMetaData();
         System.out.println("Driver version: " + metaData.getDriverVersion());
     }
@@ -24,7 +25,7 @@ class DataBase {
             String id = getIDFromDataBase(Vars.EMPLOYEE_DB);
             if (id == null)
                 id = "1";
-
+        
 
             statement.setString(1, id);
             statement.setInt(2, agency);
@@ -40,28 +41,7 @@ class DataBase {
 
     }
 
-    void insertToClientDataBase(String name) throws SQLException {
-
-        String insert = "INSERT INTO CLIENT VALUES (?,?,CURRENT_DATE)";
-        Savepoint sp = conn.setSavepoint();
-
-        try (PreparedStatement statement = conn.prepareStatement(insert)) {
-            String id = getIDFromDataBase(Vars.CLIENT_DB);
-            if (id == null)
-                id = "1";
-            statement.setString(1, id);
-            statement.setString(2, name);
-            //statement.setString(3, date);
-            statement.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            conn.rollback(sp);
-        } finally {
-            conn.commit();
-
-        }
-
-    }
+    
 
     void insertToVariationDataBase(String security, int insurance, String eq) throws SQLException {
 
@@ -84,7 +64,28 @@ class DataBase {
             conn.commit();
         }
     }
+void insertToClientDataBase(String name) throws SQLException {
 
+        String insert = "INSERT INTO CLIENT VALUES (?,?,CURRENT_DATE)";
+        Savepoint sp = conn.setSavepoint();
+
+        try (PreparedStatement statement = conn.prepareStatement(insert)) {
+            String id = getIDFromDataBase(Vars.CLIENT_DB);
+            if (id == null)
+                id = "1";
+            statement.setString(1, id);
+            statement.setString(2, name);
+            //statement.setString(3, date);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            conn.rollback(sp);
+        } finally {
+            conn.commit();
+
+        }
+
+    }
     void insertToCarDataBase(int agency, String car) throws SQLException {
 
         String insert = "INSERT INTO CAR VALUES (?,?,?,?)";
@@ -156,30 +157,7 @@ class DataBase {
         return employeeList;
     }
 
-    ArrayList<String> selectFromCarDataBase() throws SQLException {
-        ArrayList<String> carList = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        String query = "SELECT (SELECT AGENCY_LOCATION FROM AGENCY WHERE AGENCY.AGENCY_ID = CAR.AGENCY_ID),CAR_MODEL,STATUS JOIN_DATE FROM CAR";
-        Savepoint sp = conn.setSavepoint();
-        try (Statement statement = conn.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
-                String agency = resultSet.getString(1);
-                String car = resultSet.getString(2);
-                String status = resultSet.getString(3);
-                sb.append("from ").append(agency).append(" model: ").append(car).append(" status :").append(status);
-                carList.add(sb.toString());
-                sb.setLength(0);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            conn.rollback(sp);
-        } finally {
-            conn.commit();
-
-        }
-        return carList;
-    }
+    
 
     ArrayList<String> selectFromVariationDataBase() throws SQLException {
         ArrayList<String> variationList = new ArrayList<>();
@@ -223,5 +201,29 @@ class DataBase {
             conn.commit();
         }
         return id != null ? id : "1";
+    }
+    ArrayList<String> selectFromCarDataBase() throws SQLException {
+        ArrayList<String> carList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        String query = "SELECT (SELECT AGENCY_LOCATION FROM AGENCY WHERE AGENCY.AGENCY_ID = CAR.AGENCY_ID),CAR_MODEL,STATUS JOIN_DATE FROM CAR";
+        Savepoint sp = conn.setSavepoint();
+        try (Statement statement = conn.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                String agency = resultSet.getString(1);
+                String car = resultSet.getString(2);
+                String status = resultSet.getString(3);
+                sb.append("from ").append(agency).append(" model: ").append(car).append(" status :").append(status);
+                carList.add(sb.toString());
+                sb.setLength(0);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            conn.rollback(sp);
+        } finally {
+            conn.commit();
+
+        }
+        return carList;
     }
 }
